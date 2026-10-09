@@ -1,0 +1,103 @@
+<!DOCTYPE html><html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Study Assistant</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px 14px;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172033;
+    }
+    .container {
+      max-width: 650px;
+      margin: 30px auto;
+      padding: 25px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px #0000000d;
+    }
+    h1 { margin-bottom: 8px; color: #2563eb; }
+    p { line-height: 1.6; color: #64748b; }
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 16px;
+      resize: vertical;
+    }
+    button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    button:disabled { opacity: .6; }
+    #hasil {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8fafc;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+    .label { font-size: 13px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>AI Study Assistant 📚</h1>
+    <p>Teman belajar untuk memahami soal dan mempelajari langkah penyelesaiannya.</p><label for="soal"><strong>Masukkan soal kamu</strong></label>
+<p class="label">Contoh: Jelaskan apa itu fotosintesis.</p>
+<textarea id="soal" maxlength="5000" placeholder="Ketik atau tempel soal di sini..."></textarea>
+
+<button id="tombol" onclick="analisis()">Bantu Saya Belajar</button>
+<div id="hasil" hidden></div>
+<p class="label">Versi demo untuk latihan belajar.</p>
+
+  </main>  <script>
+    async function analisis() {
+      const soal = document.getElementById("soal").value.trim();
+      const hasil = document.getElementById("hasil");
+      const tombol = document.getElementById("tombol");
+
+      hasil.hidden = false;
+
+      if (!soal) {
+        hasil.textContent = "Masukkan soal terlebih dahulu.";
+        return;
+      }
+
+      tombol.disabled = true;
+      tombol.textContent = "Memproses...";
+      hasil.textContent = "Sedang memproses soal...";
+
+      try {
+        const response = await fetch("/analisis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ soal })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Terjadi kesalahan.");
+        hasil.textContent = data.hasil;
+      } catch (error) {
+        hasil.textContent = "Gagal memproses: " + error.message;
+      } finally {
+        tombol.disabled = false;
+        tombol.textContent = "Bantu Saya Belajar";
+      }
+    }
+  </script></body>
+  </html>
